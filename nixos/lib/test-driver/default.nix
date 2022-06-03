@@ -14,7 +14,7 @@
 
 python3Packages.buildPythonApplication rec {
   pname = "nixos-test-driver";
-  version = "1.0";
+  version = "1.1";
   src = ./.;
 
   propagatedBuildInputs = [ coreutils netpbm python3Packages.colorama python3Packages.ptpython qemu_pkg socat vde2 ]
@@ -25,8 +25,10 @@ python3Packages.buildPythonApplication rec {
   checkPhase = ''
     mypy --disallow-untyped-defs \
           --no-implicit-optional \
+          --pretty \
+          --no-color-output \
           --ignore-missing-imports ${src}/test_driver
-    pylint --errors-only ${src}/test_driver
+    pylint --errors-only --enable=unused-import ${src}/test_driver
     black --check --diff ${src}/test_driver
   '';
 }

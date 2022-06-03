@@ -64,23 +64,20 @@ let
         filter =
           builtins.filterSource
             (n: t:
-              (t == "directory" -> baseNameOf n != "tests")
+              cleanSourceFilter n t
+              && (t == "directory" -> baseNameOf n != "tests")
               && (t == "file" -> hasSuffix ".nix" n)
             );
-        pull = dir:
-          if isStorePath pkgs.path
-          then "${builtins.storePath pkgs.path}/${dir}"
-          else filter "${toString pkgs.path}/${dir}";
       in
         pkgs.runCommand "lazy-options.json" {
-          libPath = pull "lib";
-          pkgsLibPath = pull "pkgs/pkgs-lib";
-          nixosPath = pull "nixos";
+          libPath = filter "${toString pkgs.path}/lib";
+          pkgsLibPath = filter "${toString pkgs.path}/pkgs/pkgs-lib";
+          nixosPath = filter "${toString pkgs.path}/nixos";
           modules = map (p: ''"${removePrefix "${modulesPath}/" (toString p)}"'') docModules.lazy;
         } ''
           export NIX_STORE_DIR=$TMPDIR/store
           export NIX_STATE_DIR=$TMPDIR/state
-          ${pkgs.nix}/bin/nix-instantiate \
+          ${pkgs.buildPackages.nix}/bin/nix-instantiate \
             --show-trace \
             --eval --json --strict \
             --argstr libPath "$libPath" \
@@ -133,7 +130,7 @@ let
       genericName = "View NixOS documentation in a web browser";
       icon = "nix-snowflake";
       exec = "nixos-help";
-      categories = "System";
+      categories = ["System"];
     };
 
     in pkgs.symlinkJoin {

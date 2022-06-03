@@ -66,8 +66,8 @@ let
     desktopName = pname;
     exec = pname;
     comment = "JavaFx application to visualize and modify the scenegraph of running JavaFx applications.";
-    mimeType = "application/java;application/java-vm;application/java-archive";
-    categories = "Development";
+    mimeTypes = [ "application/java" "application/java-vm" "application/java-archive" ];
+    categories = [ "Development" ];
   };
 
 in stdenv.mkDerivation rec {
@@ -96,6 +96,7 @@ in stdenv.mkDerivation rec {
   desktopItems = [ desktopItem ];
 
   meta = with lib; {
+    broken = stdenv.isDarwin;
     description = "JavaFx application to visualize and modify the scenegraph of running JavaFx applications.";
     longDescription = ''
       A JavaFX application designed to make it simple to understand the current state of your application scenegraph

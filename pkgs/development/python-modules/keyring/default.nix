@@ -13,12 +13,14 @@
 
 buildPythonPackage rec {
   pname = "keyring";
-  version = "23.4.0";
-  disabled = pythonOlder "3.6";
+  version = "23.5.1";
+  disabled = pythonOlder "3.7";
+
+  format = "pyproject";
 
   src = fetchPypi {
     inherit pname version;
-    sha256 = "sha256-iPIGAkKV48b7FrsKYPtLt+wRhWKdxacp8SqnwjbQE4c=";
+    hash = "sha256-3uUCzfGKmCEb70KO6hFFajPABxiy8IUk/Vcnx/Qkv/0=";
   };
 
   nativeBuildInputs = [
@@ -28,8 +30,7 @@ buildPythonPackage rec {
   propagatedBuildInputs = [
     # this should be optional, however, it has a different API
     importlib-metadata # see https://github.com/jaraco/keyring/issues/503#issuecomment-798973205
-
-    dbus-python
+  ] ++ lib.optionals stdenv.isLinux [
     jeepney
     secretstorage
   ];

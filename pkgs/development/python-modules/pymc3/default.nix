@@ -1,72 +1,64 @@
 { lib
-, fetchPypi
-, buildPythonPackage
-, pythonOlder
-, Theano
-, pandas
-, patsy
-, joblib
-, tqdm
-, six
-, h5py
+, aeppl
+, aesara
 , arviz
-, packaging
-, pytest
-, nose
-, parameterized
+, buildPythonPackage
+, cachetools
+, cloudpickle
 , fastprogress
+, fetchFromGitHub
+, numpy
+, pythonOlder
+, scipy
 , typing-extensions
 }:
 
 buildPythonPackage rec {
   pname = "pymc3";
-  version = "3.11.4";
-  disabled = pythonOlder "3.5";
+  version = "unstable-2022-05-23";
+  format = "setuptools";
 
-  src = fetchPypi {
-    inherit pname version;
-    sha256 = "3b88d1e6c85f7fb8a9b99d6f136ac860672170370ec4146338fdd160c3b3fd3f";
+  disabled = pythonOlder "3.7";
+
+  src = fetchFromGitHub {
+    owner = "pymc-devs";
+    repo = "pymc3";
+    rev = "b5a5b569779673914c9420c1cc0135b118505ff5";
+    hash = "sha256-vkIFwdjX2Rex8oqscVMP4xh0K4bjmN/RL7aQmOI//Dw=";
   };
 
-  # No need for coverage stats in Nix builds
-  postPatch = ''
-    substituteInPlace setup.py --replace ", 'pytest-cov'" ""
-  '';
-
   propagatedBuildInputs = [
-    Theano
-    pandas
-    patsy
-    joblib
-    tqdm
-    six
-    h5py
+    aeppl
+    aesara
     arviz
-    packaging
+    cachetools
+    cloudpickle
     fastprogress
+    numpy
+    scipy
     typing-extensions
   ];
 
-  checkInputs = [
-    pytest
-    nose
-    parameterized
-  ];
+  postPatch = ''
+    substituteInPlace setup.py \
+      --replace ', "pytest-cov"' ""
+    substituteInPlace requirements.txt \
+      --replace "aesara==2.6.2" "aesara" \
+      --replace "aeppl==0.0.28" "aeppl"
+  '';
 
   # The test suite is computationally intensive and test failures are not
   # indicative for package usability hence tests are disabled by default.
   doCheck = false;
-  pythonImportsCheck = [ "pymc3" ];
 
-  # For some reason tests are run as a part of the *install* phase if enabled.
-  # Theano writes compiled code to ~/.theano hence we set $HOME.
-  preInstall = "export HOME=$(mktemp -d)";
-  postInstall = "rm -rf $HOME";
+  pythonImportsCheck = [
+    "pymc"
+  ];
 
-  meta = {
+  meta = with lib; {
     description = "Bayesian estimation, particularly using Markov chain Monte Carlo (MCMC)";
     homepage = "https://github.com/pymc-devs/pymc3";
-    license = lib.licenses.asl20;
-    maintainers = with lib.maintainers; [ ilya-kolpakov ];
+    license = licenses.asl20;
+    maintainers = with maintainers; [ nidabdella ];
   };
 }

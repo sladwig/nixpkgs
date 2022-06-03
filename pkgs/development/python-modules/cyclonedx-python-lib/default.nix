@@ -2,30 +2,32 @@
 , buildPythonPackage
 , fetchFromGitHub
 , importlib-metadata
+, jsonschema
+, lxml
 , packageurl-python
 , poetry-core
-, pytestCheckHook
+, python
 , pythonOlder
 , requirements-parser
 , setuptools
 , toml
 , types-setuptools
 , types-toml
-, tox
+, xmldiff
 }:
 
 buildPythonPackage rec {
   pname = "cyclonedx-python-lib";
-  version = "0.12.3";
+  version = "2.4.0";
   format = "pyproject";
 
-  disabled = pythonOlder "3.6";
+  disabled = pythonOlder "3.9";
 
   src = fetchFromGitHub {
     owner = "CycloneDX";
     repo = pname;
-    rev = "v${version}";
-    sha256 = "1404wcwjglq025n8ncsrl2h64g1sly83cs9sc6jpiw1g5ay4a1vi";
+    rev = "refs/tags/v${version}";
+    hash = "sha256-IrMXHWeksEmON3LxJvQ3WSKwQTY0aRZ8XItWMr3p4gw=";
   };
 
   nativeBuildInputs = [
@@ -43,19 +45,22 @@ buildPythonPackage rec {
   ];
 
   checkInputs = [
-    pytestCheckHook
-    tox
+    jsonschema
+    lxml
+    xmldiff
   ];
-
-  postPatch = ''
-    substituteInPlace pyproject.toml \
-      --replace 'setuptools = "^50.3.2"' 'setuptools = "*"' \
-      --replace 'importlib-metadata = "^4.8.1"' 'importlib-metadata = "*"'
-  '';
 
   pythonImportsCheck = [
     "cyclonedx"
   ];
+
+ checkPhase = ''
+   runHook preCheck
+   # Tests require network access
+   rm tests/test_output_json.py
+   ${python.interpreter} -m unittest discover -s tests -v
+   runHook postCheck
+ '';
 
   meta = with lib; {
     description = "Python library for generating CycloneDX SBOMs";

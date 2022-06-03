@@ -197,6 +197,13 @@ in
           Whether to allow note creation by accessing a nonexistent note URL.
         '';
       };
+      requireFreeURLAuthentication = mkOption {
+        type = types.bool;
+        default = false;
+        description = ''
+          Whether to require authentication for FreeURL mode style note creation.
+        '';
+      };
       defaultPermission = mkOption {
         type = types.enum [ "freely" "editable" "limited" "locked" "private" ];
         default = "editable";
@@ -431,7 +438,7 @@ in
                 Minio secret key.
               '';
             };
-            endpoint = mkOption {
+            endPoint = mkOption {
               type = types.str;
               description = ''
                 Minio endpoint.
@@ -1023,6 +1030,7 @@ in
       '';
       serviceConfig = {
         WorkingDirectory = cfg.workDir;
+        StateDirectory = [ cfg.workDir cfg.configuration.uploadsPath ];
         ExecStart = "${cfg.package}/bin/hedgedoc";
         EnvironmentFile = mkIf (cfg.environmentFile != null) [ cfg.environmentFile ];
         Environment = [

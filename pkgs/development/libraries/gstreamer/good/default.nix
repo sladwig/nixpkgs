@@ -42,20 +42,25 @@
 , xorg
 , libgudev
 , wavpack
+, glib
 }:
 
 assert raspiCameraSupport -> (stdenv.isLinux && stdenv.isAarch64);
 
 stdenv.mkDerivation rec {
   pname = "gst-plugins-good";
-  version = "1.18.4";
+  version = "1.20.1";
 
   outputs = [ "out" "dev" ];
 
   src = fetchurl {
     url = "https://gstreamer.freedesktop.org/src/${pname}/${pname}-${version}.tar.xz";
-    sha256 = "1c1rpq709cy8maaykyn1n0kckj9c6fl3mhvixkk6xmdwkcx0xrdn";
+    sha256 = "1al4f35mx41cy2h6agvmsqkjfchsyfs0iyxzpv6pnl0xh9pqfriw";
   };
+
+  strictDeps = true;
+
+  depsBuildBuild = [ pkg-config ];
 
   nativeBuildInputs = [
     pkg-config
@@ -64,6 +69,9 @@ stdenv.mkDerivation rec {
     ninja
     gettext
     nasm
+    orc
+    libshout
+    glib
   ] ++ lib.optionals stdenv.isLinux [
     wayland-protocols
   ];

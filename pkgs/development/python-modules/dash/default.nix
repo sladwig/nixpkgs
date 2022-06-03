@@ -1,4 +1,5 @@
-{ lib
+{ stdenv
+, lib
 , buildPythonPackage
 , fetchFromGitHub
 , plotly
@@ -9,18 +10,23 @@
 , dash-table
 , pytest-mock
 , mock
+, pyyaml
 , pytestCheckHook
+, pythonOlder
 }:
 
 buildPythonPackage rec {
   pname = "dash";
-  version = "2.0.0";
+  version = "2.4.1";
+  format = "setuptools";
+
+  disabled = pythonOlder "3.6";
 
   src = fetchFromGitHub {
     owner = "plotly";
     repo = pname;
-    rev = "v${version}";
-    sha256 = "sha256-0RvA5qkwQJGyy81D5kW+IR6LbaD/KBwMy6kYxTETubg=";
+    rev = "refs/tags/v${version}";
+    sha256 = "sha256-7B1LEcEgUGJ/gDCDD4oURqli8I5YTJo9jl7l4E1aLVQ=";
   };
 
   propagatedBuildInputs = [
@@ -36,6 +42,7 @@ buildPythonPackage rec {
     pytestCheckHook
     pytest-mock
     mock
+    pyyaml
   ];
 
   disabledTestPaths = [
@@ -47,6 +54,7 @@ buildPythonPackage rec {
   pythonImportsCheck = [ "dash" ];
 
   meta = with lib; {
+    broken = stdenv.isDarwin;
     description = "Python framework for building analytical web applications";
     homepage = "https://dash.plot.ly/";
     license = licenses.mit;
