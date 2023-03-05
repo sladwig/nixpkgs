@@ -9560,6 +9560,34 @@ let
     };
   };
 
+  ContextualReturn = buildPerlPackage {
+    pname = "Contextual-Return";
+    version = "0.004014";
+    src = fetchurl {
+      url = "mirror://cpan/authors/id/D/DC/DCONWAY/Contextual-Return-0.004014.tar.gz";
+      sha256 = "09fe1415e16e49a69e13c0ef6e6a4a3fd8b856f389d3f3e624d7ab3b71719f78";
+    };
+    propagatedBuildInputs = [ Want ];
+    meta = {
+      description = "Create context-sensitive return values";
+      license = with lib.licenses; [ artistic1 gpl1Plus ];
+    };
+  };
+
+  IOPrompter = buildPerlPackage {
+    pname = "IO-Prompter";
+    version = "0.004015";
+    src = fetchurl {
+      url = "mirror://cpan/authors/id/D/DC/DCONWAY/IO-Prompter-0.004015.tar.gz";
+      sha256 = "173192b3989b1e47e606ce9ba2cacc1da3d07de216002931288318eecf8e3ffb";
+    };
+    propagatedBuildInputs = [ ContextualReturn ];
+    meta = {
+      description = "Prompt for input, read it, clean it, return it";
+      license = with lib.licenses; [ artistic1 gpl1Plus ];
+    };
+  };
+
   FileShareDir = buildPerlPackage {
     pname = "File-ShareDir";
     version = "1.118";
